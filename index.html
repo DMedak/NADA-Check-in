@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NADA Check-in | Anonimna procjena podrške</title>
+  <meta name="description" content="NADA Check-in je anonimna web funkcionalnost za kratku samoprocjenu trenutnog stanja i usmjeravanje korisnika prema podršci, forumu ili hitnim kontaktima." />
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --card: rgba(255,255,255,.86);
+      --card-solid: #ffffff;
+      --text: #241f1b;
+      --muted: #6d6259;
+      --brand: #f4b942;
+      --brand-dark: #8b5e13;
+      --accent: #eb7f67;
+      --green: #4f9d69;
+      --blue: #5271a3;
+      --danger: #c94747;
+      --shadow: 0 24px 70px rgba(56, 43, 24, .14);
+      --radius: 28px;
+      --border: rgba(87, 67, 35, .12);
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(244, 185, 66, .28), transparent 34rem),
+        radial-gradient(circle at 85% 15%, rgba(235, 127, 103, .18), transparent 30rem),
+        linear-gradient(135deg, #fffaf2 0%, var(--bg) 45%, #f4efe6 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 340px;
+      height: 340px;
+      border-radius: 999px;
+      background: rgba(244, 185, 66, .16);
+      filter: blur(4px);
+      z-index: -1;
+    }
+
+    body::before { left: -140px; bottom: 8%; }
+    body::after { right: -150px; bottom: -80px; background: rgba(79, 157, 105, .13); }
+
+    a { color: inherit; }
+
+    .container {
+      width: min(1160px, calc(100% - 36px));
+      margin: 0 auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(18px);
+      background: rgba(255, 250, 243, .76);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      min-height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      text-decoration: none;
+      font-weight: 900;
+      letter-spacing: -.03em;
+    }
+
+    .logo-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 17px;
+      background: linear-gradient(145deg, #ffdb7a, var(--brand));
+      display: grid;
+      place-items: center;
+      box-shadow: 0 12px 30px rgba(244, 185, 66, .35);
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .logo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 5px;
+      background: #fff;
+      display: none;
+    }
+
+    .logo-fallback {
+      font-weight: 950;
+      color: #5b3f00;
+      font-size: 13px;
+      letter-spacing: -.04em;
+    }
+
+    .brand small {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: normal;
+      margin-top: 2px;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill-link,
+    .btn {
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+      white-space: nowrap;
+    }
+
+    .pill-link {
+      color: var(--muted);
+      background: rgba(255,255,255,.58);
+      border: 1px solid var(--border);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), #ffcf66);
+      color: #4f3600;
+      box-shadow: 0 12px 28px rgba(244,185,66,.33);
+    }
+
+    .btn-dark {
+      background: #241f1b;
+      color: #fff;
+      box-shadow: 0 14px 34px rgba(36,31,27,.22);
+    }
+
+    .btn-light {
+      background: rgba(255,255,255,.82);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: #fff1f1;
+      color: var(--danger);
+      border: 1px solid rgba(201,71,71,.22);
+    }
+
+    .pill-link:hover,
+    .btn:hover { transform: translateY(-2px); }
+
+    .hero {
+      padding: 70px 0 34px;
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      align-items: center;
+      gap: 44px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid var(--border);
+      padding: 9px 13px;
+      border-radius: 999px;
+      font-weight: 850;
+      color: var(--brand-dark);
+      box-shadow: 0 8px 24px rgba(56,43,24,.07);
+      margin-bottom: 20px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--green);
+      box-shadow: 0 0 0 6px rgba(79,157,105,.14);
+    }
+
+    h1 {
+      font-size: clamp(42px, 6vw, 76px);
+      line-height: .95;
+      margin: 0 0 18px;
+      letter-spacing: -.075em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #2b251f 10%, #8b5e13 45%, #e17656 85%);
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+
+    .lead {
+      font-size: clamp(17px, 2vw, 21px);
+      line-height: 1.65;
+      color: var(--muted);
+      margin: 0 0 28px;
+      max-width: 720px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .trust-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 720px;
+    }
+
+    .trust-card {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.62);
+      border-radius: 20px;
+      padding: 15px;
+      color: var(--muted);
+      font-weight: 700;
+      min-height: 86px;
+    }
+
+    .trust-card strong {
+      display: block;
+      color: var(--text);
+      font-size: 19px;
+      margin-bottom: 4px;
+    }
+
+    .hero-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: -80px -80px auto auto;
+      width: 220px;
+      height: 220px;
+      background: rgba(244,185,66,.24);
+      border-radius: 999px;
+    }
+
+    .phone {
+      position: relative;
+      border-radius: 36px;
+      border: 10px solid #241f1b;
+      background: #fff;
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(36,31,27,.22);
+      max-width: 430px;
+      margin: 0 auto;
+    }
+
+    .phone-header {
+      background: linear-gradient(135deg, #ffcf66, #f6b842);
+      padding: 28px 20px 24px;
+    }
+
+    .phone-header span {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.5);
+      font-weight: 900;
+      font-size: 12px;
+      color: #6a4700;
+    }
+
+    .phone-header h2 {
+      margin: 14px 0 0;
+      font-size: 31px;
+      letter-spacing: -.05em;
+    }
+
+    .phone-body { padding: 18px; }
+
+    .mini-option {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 14px;
+      border-radius: 18px;
+      background: #faf7f1;
+      border: 1px solid #eee2d0;
+      margin-bottom: 10px;
+      font-weight: 800;
+      color: #504842;
+    }
+
+    .mini-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      flex: 0 0 auto;
+    }
+
+    section { padding: 42px 0; }
+
+    .section-title {
+      font-size: clamp(30px, 4vw, 46px);
+      letter-spacing: -.06em;
+      line-height: 1.05;
+      margin: 0 0 12px;
+    }
+
+    .section-subtitle {
+      color: var(--muted);
+      line-height: 1.65;
+      margin: 0 0 26px;
+      font-size: 17px;
+      max-width: 760px;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      margin: 0 0 22px;
+    }
+
+    .progress-bar {
+      height: 12px;
+      flex: 1;
+      background: rgba(36,31,27,.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--brand), var(--accent));
+      border-radius: inherit;
+      transition: width .25s ease;
+    }
+
+    .progress-text {
+      font-weight: 900;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .question-card {
+      animation: fadeUp .26s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .question-kicker {
+      font-weight: 900;
+      color: var(--brand-dark);
+      margin: 0 0 10px;
+    }
+
+    .question-title {
+      font-size: clamp(22px, 2.3vw, 32px);
+      line-height: 1.04;
+      letter-spacing: -.05em;
+      margin: 0 0 10px;
+    }
+
+    .options {
+      display: grid;
+      gap: 9px;
+      margin: 18px 0;
+    }
+
+    .option {
+      width: 100%;
+      text-align: left;
+      border: 1px solid rgba(87,67,35,.13);
+      background: rgba(255,255,255,.72);
+      border-radius: 18px;
+      padding: 13px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: .18s ease;
+      color: var(--text);
+    }
+
+    .option:hover,
+    .option.selected {
+      border-color: rgba(244,185,66,.75);
+      background: rgba(255,247,225,.95);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 28px rgba(56,43,24,.08);
+    }
+
+    .option .bubble {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: #fff3d2;
+      flex: 0 0 auto;
+      font-size: 19px;
+    }
+
+    .option strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 3px;
+    }
+
+    .option small {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .question-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .side-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .info-box {
+      background: rgba(255,255,255,.7);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+    }
+
+    .info-box h3 {
+      margin: 0 0 8px;
+      letter-spacing: -.03em;
+    }
+
+    .info-box p,
+    .info-box li {
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .info-box ul {
+      margin: 10px 0 0;
+      padding-left: 18px;
+    }
+
+    .result-card {
+      display: none;
+      animation: fadeUp .32s ease both;
+    }
+
+    .score-circle {
+      width: 132px;
+      height: 132px;
+      border-radius: 999px;
+      background: conic-gradient(var(--brand) 0deg, #efe4d5 0deg);
+      display: grid;
+      place-items: center;
+      margin: 4px 0 20px;
+      position: relative;
+    }
+
+    .score-circle::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: inherit;
+      background: #fffaf3;
+    }
+
+    .score-circle span {
+      position: relative;
+      z-index: 1;
+      font-size: 31px;
+      font-weight: 950;
+      letter-spacing: -.05em;
+    }
+
+    .result-label {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: #fff4d8;
+      color: var(--brand-dark);
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+
+    .result-title {
+      margin: 0 0 12px;
+      font-size: clamp(30px, 4vw, 48px);
+      letter-spacing: -.06em;
+      line-height: 1.04;
+    }
+
+    .recommendations {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .rec-card {
+      background: rgba(255,255,255,.72);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 17px;
+    }
+
+    .rec-card strong { display:block; margin-bottom: 6px; }
+    .rec-card p { margin:0; color:var(--muted); line-height:1.5; font-size:14px; }
+
+    .resources-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .resource {
+      background: rgba(255,255,255,.75);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 21px;
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .resource h3 { margin: 0 0 9px; letter-spacing: -.04em; }
+    .resource p { margin: 0 0 18px; color: var(--muted); line-height: 1.55; }
+
+    .sos {
+      background: linear-gradient(135deg, #2b251f, #493725);
+      color: #fff;
+      border-radius: 34px;
+      padding: 34px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 18px;
+      align-items: center;
+      box-shadow: 0 28px 70px rgba(36,31,27,.24);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sos::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -70px;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(244,185,66,.2);
+    }
+
+    .sos h2 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 44px); letter-spacing: -.055em; }
+    .sos p { margin: 0; color: rgba(255,255,255,.75); line-height:1.6; max-width: 740px; }
+
+    .footer {
+      padding: 32px 0 46px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .hidden { display: none !important; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      background: #241f1b;
+      color: #fff;
+      padding: 13px 17px;
+      border-radius: 999px;
+      box-shadow: 0 18px 45px rgba(0,0,0,.22);
+      transition: .22s ease;
+      z-index: 60;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+
+    .checkin-modal,
+    .breathing-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(36, 31, 27, .46);
+      backdrop-filter: blur(14px);
+    }
+
+    .checkin-modal.open,
+    .breathing-modal.open { display: flex; }
+
+    .modal-shell {
+      width: min(1180px, 98vw);
+      max-height: min(94vh, 920px);
+      overflow: hidden;
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at top left, rgba(244,185,66,.24), transparent 28rem),
+        linear-gradient(135deg, #fffaf3, #f5efe6);
+      border: 1px solid rgba(255,255,255,.58);
+      box-shadow: 0 34px 90px rgba(0,0,0,.28);
+      animation: modalIn .22s ease both;
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(18px) scale(.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(255,255,255,.58);
+    }
+
+    .modal-title { display: flex; align-items: center; gap: 12px; }
+    .modal-title h2 { margin: 0; letter-spacing: -.04em; font-size: 24px; }
+    .modal-title p { margin: 2px 0 0; color: var(--muted); font-size: 13px; font-weight: 700; }
+
+    .modal-close {
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(36,31,27,.08);
+      color: var(--text);
+      font-size: 24px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: .18s ease;
+    }
+
+    .modal-close:hover { transform: rotate(90deg); background: rgba(36,31,27,.14); }
+
+    .modal-body {
+      overflow: auto;
+      max-height: calc(min(94vh, 920px) - 74px);
+      padding: 18px 20px 20px;
+    }
+
+    .modal-body .app-grid {
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 18px;
+    }
+    .modal-body .panel { box-shadow: none; }
+
+    .breathing-shell {
+      width: min(560px, 100%);
+      border-radius: 34px;
+      padding: 28px;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(244,185,66,.34), transparent 17rem),
+        linear-gradient(145deg, #fffaf3, #f0e6da);
+      box-shadow: 0 34px 90px rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.62);
+      text-align: center;
+      animation: modalIn .22s ease both;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .breathing-shell::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(79,157,105,.14);
+      left: -70px;
+      bottom: -90px;
+    }
+
+    .breathing-content { position: relative; z-index: 1; }
+
+    .breathing-orb-wrap {
+      height: 230px;
+      display: grid;
+      place-items: center;
+      margin: 8px 0 10px;
+    }
+
+    .breathing-orb {
+      width: 132px;
+      height: 132px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 35% 30%, #fff7d7, var(--brand) 54%, #e58d66 100%);
+      box-shadow: 0 20px 60px rgba(244,185,66,.42), inset 0 0 32px rgba(255,255,255,.44);
+      transform: scale(1);
+      transition: transform 4s ease-in-out;
+    }
+
+    .breathing-orb.inhale { transform: scale(1.42); }
+    .breathing-orb.hold { transform: scale(1.42); transition-duration: .2s; }
+    .breathing-orb.exhale { transform: scale(.86); transition-duration: 6s; }
+
+    .breathing-step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.7);
+      border: 1px solid var(--border);
+      font-weight: 950;
+      color: var(--brand-dark);
+      margin-bottom: 12px;
+    }
+
+    .breathing-count {
+      font-size: clamp(46px, 8vw, 76px);
+      font-weight: 950;
+      letter-spacing: -.08em;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .breathing-text {
+      color: var(--muted);
+      line-height: 1.6;
+      margin: 8px auto 20px;
+      max-width: 420px;
+    }
+
+    .breathing-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+
+    @media (max-width: 940px) {
+      .hero, .app-grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 42px; }
+      .hero-card { order: -1; }
+      .resources-grid, .recommendations { grid-template-columns: 1fr; }
+      .sos { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .container { width: min(100% - 24px, 1160px); }
+      .nav { align-items: flex-start; padding: 14px 0; flex-direction: column; }
+      .nav-actions { width: 100%; justify-content: stretch; }
+      .nav-actions a { flex: 1; }
+      .trust-row { grid-template-columns: 1fr; }
+      .panel { padding: 20px; border-radius: 24px; }
+      .phone { border-width: 7px; border-radius: 30px; }
+      .sos { padding: 24px; border-radius: 26px; }
+      .question-actions .btn { flex: 1; }
+      .checkin-modal, .breathing-modal { padding: 10px; align-items: stretch; }
+      .modal-shell { max-height: 96vh; border-radius: 24px; }
+      .modal-body { padding: 14px; max-height: calc(96vh - 82px); }
+      .modal-body .app-grid { grid-template-columns: 1fr; }
+      .modal-title h2 { font-size: 20px; }
+      .modal-title p { display: none; }
+      .breathing-shell { border-radius: 24px; padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container nav">
+      <a class="brand" href="#top" aria-label="NADA Check-in početna">
+        <span class="logo-wrap">
+          <img id="brandLogo" src="logo-nada.png" alt="Logo udruge NADA" />
+          <span class="logo-fallback">NADA</span>
+        </span>
+        <span>
+          NADA Check-in
+          <small>anonimna procjena podrške</small>
+        </span>
+      </a>
+
+      <nav class="nav-actions" aria-label="Glavna navigacija">
+        <a class="pill-link js-open-checkin" href="#checkin">Pokreni procjenu</a>
+        <a class="pill-link" href="#resursi">Resursi</a>
+        <a class="btn btn-primary" href="https://nada-forum.softr.app" target="_blank" rel="noopener">Otvori forum</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="container hero">
+      <div>
+        <div class="eyebrow"><span class="dot"></span> Sigurno, kratko i anonimno</div>
+        <h1><span class="gradient-text">Provjeri kako si</span> i pronađi sljedeći korak.</h1>
+        <p class="lead">
+          Ova dodatna funkcionalnost služi kao mali digitalni pomoćnik uz NADA forum. Kroz nekoliko pitanja korisnik dobiva okvirnu preporuku: odmor i samopomoć, razgovor s osobom od povjerenja, objava na forumu ili kontakt podrške.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-dark js-open-checkin" href="#checkin">Započni check-in</a>
+          <a class="btn btn-light" href="https://nada-forum.softr.app" target="_blank" rel="noopener">Idi na forum</a>
+        </div>
+        <div class="trust-row">
+          <div class="trust-card"><strong>8 pitanja</strong>Brza procjena trenutnog stanja.</div>
+          <div class="trust-card"><strong>0 prijava</strong>Ne traži ime, mail ni lozinku.</div>
+          <div class="trust-card"><strong>JS logika</strong>Bodovanje i preporuke u kodu.</div>
+        </div>
+      </div>
+
+      <div class="hero-card" aria-hidden="true">
+        <div class="phone">
+          <div class="phone-header">
+            <span>NADA digitalna podrška</span>
+            <h2>Kako se osjećaš danas?</h2>
+          </div>
+          <div class="phone-body">
+            <div class="mini-option"><span class="mini-icon">🌿</span> Trebam kratko smirivanje</div>
+            <div class="mini-option"><span class="mini-icon">💬</span> Želim razgovarati s nekim</div>
+            <div class="mini-option"><span class="mini-icon">🧭</span> Ne znam kome se obratiti</div>
+            <div class="mini-option"><span class="mini-icon">🤝</span> Želim podršku zajednice</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="checkin" class="checkin-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="NADA Check-in procjena">
+      <div class="modal-shell">
+        <div class="modal-head">
+          <div class="modal-title">
+            <span class="logo-wrap"><span class="logo-fallback">NADA</span></span>
+            <span>
+              <h2>NADA Check-in</h2>
+              <p>Anonimna procjena podrške u zasebnom prozoru</p>
+            </span>
+          </div>
+          <button class="modal-close" type="button" id="closeCheckin" aria-label="Zatvori procjenu">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="app-grid">
+        <div class="panel">
+          <div id="quizArea">
+            <div class="progress-wrap">
+              <div class="progress-bar" aria-hidden="true"><div class="progress-fill" id="progressFill"></div></div>
+              <span class="progress-text" id="progressText">1/8</span>
+            </div>
+
+            <div class="question-card" id="questionCard"></div>
+
+            <div class="question-actions">
+              <button class="btn btn-light" id="backBtn" type="button">Natrag</button>
+              <button class="btn btn-primary" id="nextBtn" type="button">Dalje</button>
+            </div>
+          </div>
+
+          <div id="resultArea" class="result-card">
+            <div class="score-circle" id="scoreCircle"><span id="scoreText">0%</span></div>
+            <div class="result-label" id="resultLabel">Rezultat</div>
+            <h2 class="result-title" id="resultTitle">Tvoja preporuka</h2>
+            <p class="section-subtitle" id="resultDescription"></p>
+
+            <div class="recommendations" id="recommendations"></div>
+
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="https://nada-forum.softr.app" target="_blank" rel="noopener">Podijeli iskustvo na forumu</a>
+              <button class="btn btn-light" type="button" id="copyResultBtn">Kopiraj preporuku</button>
+              <button class="btn btn-dark" type="button" id="restartBtn">Ponovi procjenu</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="side-card">
+          <div class="info-box">
+            <h3>Što ova funkcionalnost radi?</h3>
+            <p>Prikuplja odgovore, računa bodove i prema rezultatu prikazuje preporuku. Sve se izvršava u pregledniku pomoću HTML-a, CSS-a i JavaScripta.</p>
+          </div>
+          <div class="info-box">
+            <h3>Privatnost</h3>
+            <p>Odgovori se ne šalju na server. Trenutna verzija ne sprema osobne podatke i ne traži registraciju.</p>
+          </div>
+          <div class="info-box">
+            <h3>Napomena</h3>
+            <ul>
+              <li>Ovo nije medicinska dijagnoza.</li>
+              <li>U hitnoj opasnosti treba kontaktirati hitne službe.</li>
+              <li>Forum je podrška zajednice, ne zamjena za stručnjaka.</li>
+            </ul>
+          </div>
+        </aside>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="resursi" class="container">
+      <h2 class="section-title">Brzi resursi podrške</h2>
+      <p class="section-subtitle">Dodatni dio aplikacije korisniku odmah nudi nekoliko smjerova djelovanja, ovisno o tome treba li mu razgovor, zajednica ili hitna pomoć.</p>
+
+      <div class="resources-grid">
+        <article class="resource">
+          <div>
+            <h3>Forum zajednice</h3>
+            <p>Mjesto za anonimno dijeljenje iskustava, pitanja i podršku drugih članova.</p>
+          </div>
+          <a class="btn btn-primary" href="https://nada-forum.softr.app" target="_blank" rel="noopener">Otvori forum</a>
+        </article>
+
+        <article class="resource">
+          <div>
+            <h3>Tehnika smirivanja</h3>
+            <p>Pokušaj 4-4-6 disanje: udah 4 sekunde, zadržavanje 4 sekunde, izdah 6 sekundi. Ponovi 5 puta.</p>
+          </div>
+          <button class="btn btn-light" type="button" onclick="startBreathing()">Pokreni vježbu</button>
+        </article>
+
+        <article class="resource">
+          <div>
+            <h3>Hitna situacija</h3>
+            <p>Ako si u neposrednoj opasnosti ili misliš da bi netko mogao biti ozlijeđen, odmah kontaktiraj hitne službe ili osobu od povjerenja.</p>
+          </div>
+          <a class="btn btn-danger" href="tel:112">Nazovi 112</a>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container footer">
+    <strong>NADA Check-in</strong> — dodatna programska funkcionalnost izrađena uz forum. Aplikacija je edukativnog karaktera i služi za usmjeravanje korisnika prema podršci. Ne zamjenjuje liječnika, psihologa, psihoterapeuta ni kriznu službu.
+  </footer>
+
+  <div class="toast" id="toast">Kopirano.</div>
+
+
+  <div class="breathing-modal" id="breathingModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Vježba disanja">
+    <div class="breathing-shell">
+      <button class="modal-close" type="button" id="closeBreathing" aria-label="Zatvori vježbu" style="position:absolute;right:16px;top:16px;z-index:2;">×</button>
+      <div class="breathing-content">
+        <div class="breathing-step" id="breathingStep">Pripremi se</div>
+        <div class="breathing-orb-wrap">
+          <div class="breathing-orb" id="breathingOrb"></div>
+        </div>
+        <p class="breathing-count" id="breathingCount">4</p>
+        <p class="breathing-text" id="breathingText">Udahni polako kroz nos i prati krug na ekranu.</p>
+        <div class="breathing-actions">
+          <button class="btn btn-primary" type="button" id="restartBreathing">Ponovi vježbu</button>
+          <button class="btn btn-light" type="button" id="stopBreathing">Zatvori</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const FORUM_URL = "https://nada-forum.softr.app";
+
+    const questions = [
+      {
+        title: "Kako bi opisao/la svoje trenutno emocionalno stanje?",
+        help: "Odaberi odgovor koji ti je najbliži u ovom trenutku.",
+        options: [
+          { label: "Uglavnom stabilno", text: "Imam teži dan, ali mogu funkcionirati.", score: 0, icon: "🌤️" },
+          { label: "Napeto ili zabrinuto", text: "Osjećam stres, pritisak ili brigu.", score: 1, icon: "🌫️" },
+          { label: "Preplavljeno", text: "Teško mi je smiriti misli i emocije.", score: 2, icon: "🌧️" },
+          { label: "Vrlo teško", text: "Osjećam da mi treba pomoć odmah.", score: 3, icon: "⛈️" }
+        ]
+      },
+      {
+        title: "Koliko ti je teško obavljati svakodnevne obaveze?",
+        help: "Misli na školu, fakultet, posao, kućne obaveze ili odnose.",
+        options: [
+          { label: "Nije mi značajno teško", text: "Uglavnom uspijevam odraditi dan.", score: 0, icon: "✅" },
+          { label: "Ponekad mi je teško", text: "Imam padove, ali se nekako organiziram.", score: 1, icon: "🕒" },
+          { label: "Često mi je teško", text: "Obaveze me dosta iscrpljuju.", score: 2, icon: "📉" },
+          { label: "Gotovo ne mogu", text: "Osjećam da ne mogu normalno funkcionirati.", score: 3, icon: "🛑" }
+        ]
+      },
+      {
+        title: "Imaš li osobu s kojom možeš iskreno razgovarati?",
+        help: "To može biti prijatelj, član obitelji, stručna osoba ili netko iz zajednice.",
+        options: [
+          { label: "Da, imam podršku", text: "Znam kome se mogu javiti.", score: 0, icon: "🤝" },
+          { label: "Možda, ali ne uvijek", text: "Nekad se ustručavam tražiti pomoć.", score: 1, icon: "💭" },
+          { label: "Teško mi je razgovarati", text: "Bojim se osude ili nerazumijevanja.", score: 2, icon: "🔒" },
+          { label: "Nemam nikoga", text: "Osjećam se sam/a u ovome.", score: 3, icon: "🕯️" }
+        ]
+      },
+      {
+        title: "Kako spavaš zadnjih nekoliko dana?",
+        help: "San često pokazuje koliko smo pod pritiskom.",
+        options: [
+          { label: "Dobro", text: "Spavam približno normalno.", score: 0, icon: "😴" },
+          { label: "Promjenjivo", text: "Neke noći su lošije.", score: 1, icon: "🌙" },
+          { label: "Loše", text: "Često se budim ili ne mogu zaspati.", score: 2, icon: "⏰" },
+          { label: "Vrlo loše", text: "San mi ozbiljno narušava dan.", score: 3, icon: "🌀" }
+        ]
+      },
+      {
+        title: "Koliko često osjećaš sram, krivnju ili strah od osude?",
+        help: "Odgovor nije za procjenu tvoje vrijednosti, nego za razumijevanje razine opterećenja.",
+        options: [
+          { label: "Rijetko", text: "Takvi osjećaji nisu česti.", score: 0, icon: "🌱" },
+          { label: "Ponekad", text: "Jave se u određenim situacijama.", score: 1, icon: "🍂" },
+          { label: "Često", text: "Dosta utječu na moje ponašanje.", score: 2, icon: "🧱" },
+          { label: "Skoro stalno", text: "Teško mi je maknuti se od tih misli.", score: 3, icon: "⚠️" }
+        ]
+      },
+      {
+        title: "Imaš li osjećaj da ti treba stručna podrška?",
+        help: "Nije slabost potražiti pomoć. To je znak da brineš o sebi.",
+        options: [
+          { label: "Ne trenutno", text: "Za sada mi je dovoljna samopomoć.", score: 0, icon: "🧘" },
+          { label: "Nisam siguran/sigurna", text: "Razmišljam o tome, ali nisam odlučio/la.", score: 1, icon: "🧭" },
+          { label: "Vjerojatno da", text: "Mislim da bi razgovor sa stručnom osobom pomogao.", score: 2, icon: "💬" },
+          { label: "Da, što prije", text: "Osjećam da ne bih trebao/la čekati.", score: 3, icon: "🚨" }
+        ]
+      },
+      {
+        title: "Osjećaš li se trenutno sigurno?",
+        help: "Ovo pitanje ima veću težinu jer sigurnost ima prednost pred svime.",
+        options: [
+          { label: "Da, sigurno sam", text: "Nisam u neposrednoj opasnosti.", score: 0, icon: "🟢" },
+          { label: "Uglavnom da", text: "Nisam u opasnosti, ali sam uznemiren/a.", score: 1, icon: "🟡" },
+          { label: "Nisam potpuno siguran/sigurna", text: "Trebam se maknuti, javiti nekome ili potražiti podršku.", score: 3, icon: "🟠" },
+          { label: "Ne osjećam se sigurno", text: "Potrebna je hitna reakcija ili kontakt s nekim odmah.", score: 5, icon: "🔴", urgent: true }
+        ]
+      },
+      {
+        title: "Što bi ti sada najviše pomoglo?",
+        help: "Ovaj odgovor pomaže aplikaciji da prikaže korisniji završni prijedlog.",
+        options: [
+          { label: "Kratka vježba smirivanja", text: "Želim se prvo malo stabilizirati.", score: 0, icon: "🌬️", tag: "calm" },
+          { label: "Anonimno podijeliti iskustvo", text: "Želim napisati što me muči.", score: 1, icon: "✍️", tag: "forum" },
+          { label: "Razgovor s osobom", text: "Želim se obratiti nekome tko me može saslušati.", score: 2, icon: "📞", tag: "talk" },
+          { label: "Hitna podrška", text: "Ne želim čekati i trebam pomoć sada.", score: 4, icon: "🚑", tag: "urgent", urgent: true }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    let answers = new Array(questions.length).fill(null);
+
+    const questionCard = document.getElementById("questionCard");
+    const progressFill = document.getElementById("progressFill");
+    const progressText = document.getElementById("progressText");
+    const backBtn = document.getElementById("backBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const quizArea = document.getElementById("quizArea");
+    const resultArea = document.getElementById("resultArea");
+    const restartBtn = document.getElementById("restartBtn");
+    const copyResultBtn = document.getElementById("copyResultBtn");
+    const toast = document.getElementById("toast");
+    const logoImg = document.getElementById("brandLogo");
+    const checkinModal = document.getElementById("checkin");
+    const closeCheckin = document.getElementById("closeCheckin");
+    const breathingModal = document.getElementById("breathingModal");
+    const closeBreathing = document.getElementById("closeBreathing");
+    const stopBreathing = document.getElementById("stopBreathing");
+    const restartBreathing = document.getElementById("restartBreathing");
+    const breathingOrb = document.getElementById("breathingOrb");
+    const breathingStep = document.getElementById("breathingStep");
+    const breathingCount = document.getElementById("breathingCount");
+    const breathingText = document.getElementById("breathingText");
+    let breathingTimers = [];
+
+
+    function openCheckinModal(event) {
+      if (event) event.preventDefault();
+      checkinModal.classList.add("open");
+      checkinModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeCheckinModal() {
+      checkinModal.classList.remove("open");
+      checkinModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    document.querySelectorAll(".js-open-checkin").forEach(button => {
+      button.addEventListener("click", openCheckinModal);
+    });
+
+    closeCheckin.addEventListener("click", closeCheckinModal);
+    checkinModal.addEventListener("click", (event) => {
+      if (event.target === checkinModal) closeCheckinModal();
+    });
+
+
+    logoImg.addEventListener("load", () => {
+      logoImg.style.display = "block";
+      logoImg.nextElementSibling.style.display = "none";
+    });
+
+    logoImg.addEventListener("error", () => {
+      logoImg.style.display = "none";
+      logoImg.nextElementSibling.style.display = "inline";
+    });
+
+    function renderQuestion() {
+      const q = questions[currentQuestion];
+      const selected = answers[currentQuestion];
+      const percent = (currentQuestion / questions.length) * 100;
+
+      progressFill.style.width = `${percent}%`;
+      progressText.textContent = `${currentQuestion + 1}/${questions.length}`;
+      backBtn.disabled = currentQuestion === 0;
+      backBtn.style.opacity = currentQuestion === 0 ? ".45" : "1";
+      nextBtn.textContent = currentQuestion === questions.length - 1 ? "Prikaži rezultat" : "Dalje";
+      nextBtn.disabled = selected === null;
+      nextBtn.style.opacity = selected === null ? ".55" : "1";
+
+      questionCard.innerHTML = `
+        <p class="question-kicker">Pitanje ${currentQuestion + 1} od ${questions.length}</p>
+        <h3 class="question-title">${q.title}</h3>
+        <p class="section-subtitle">${q.help}</p>
+        <div class="options">
+          ${q.options.map((option, index) => `
+            <button type="button" class="option ${selected === index ? "selected" : ""}" data-index="${index}">
+              <span class="bubble">${option.icon}</span>
+              <span>
+                <strong>${option.label}</strong>
+                <small>${option.text}</small>
+              </span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+
+      questionCard.querySelectorAll(".option").forEach(button => {
+        button.addEventListener("click", () => {
+          answers[currentQuestion] = Number(button.dataset.index);
+          renderQuestion();
+        });
+      });
+    }
+
+    function calculateResult() {
+      let score = 0;
+      let urgent = false;
+      let tags = [];
+      const maxScore = questions.reduce((total, q) => total + Math.max(...q.options.map(o => o.score)), 0);
+
+      answers.forEach((answerIndex, qIndex) => {
+        const option = questions[qIndex].options[answerIndex];
+        score += option.score;
+        if (option.urgent) urgent = true;
+        if (option.tag) tags.push(option.tag);
+      });
+
+      const percentage = Math.round((score / maxScore) * 100);
+      return { score, maxScore, percentage, urgent, tags };
+    }
+
+    function getResultContent(result) {
+      if (result.urgent || result.percentage >= 72) {
+        return {
+          level: "Visok prioritet podrške",
+          title: "Nemoj ovo nositi sam/a.",
+          color: "#c94747",
+          description: "Tvoji odgovori pokazuju da bi bilo dobro odmah se javiti osobi od povjerenja, stručnoj osobi ili hitnoj službi ako postoji opasnost. Forum može biti podrška, ali u ovakvoj situaciji prednost ima direktan razgovor i sigurnost.",
+          recs: [
+            ["Prvi korak", "Javi se osobi od povjerenja i reci da ti trenutno nije dobro."],
+            ["Sigurnost", "Ako postoji neposredna opasnost, nazovi 112 ili se makni na sigurno mjesto."],
+            ["Stručna pomoć", "Potraži stručnu podršku, savjetovalište ili liječnika obiteljske medicine."],
+            ["Forum", "Forum koristi kao dodatnu podršku, ne kao jedini oblik pomoći."]
+          ]
+        };
+      }
+
+      if (result.percentage >= 45) {
+        return {
+          level: "Preporučuje se razgovor",
+          title: "Vrijeme je da ne ostaneš sam/a s ovim.",
+          color: "#eb7f67",
+          description: "Odgovori upućuju na povećanu emocionalnu opterećenost. Korisno bi bilo razgovarati s osobom od povjerenja, otvoriti temu na forumu ili potražiti savjet stručne osobe ako se stanje nastavi.",
+          recs: [
+            ["Razgovor", "Odaberi jednu osobu kojoj možeš poslati kratku poruku danas."],
+            ["Forum", "Napiši anonimnu objavu i opiši što ti je trenutno najteže."],
+            ["Rutina", "Pokušaj danas napraviti jednu malu stvar: obrok, tuširanje, šetnja ili odmor."],
+            ["Praćenje", "Ponovi check-in za nekoliko dana i vidi mijenja li se rezultat."]
+          ]
+        };
+      }
+
+      if (result.percentage >= 20) {
+        return {
+          level: "Blaga do umjerena opterećenost",
+          title: "Dobro je reagirati na vrijeme.",
+          color: "#f4b942",
+          description: "Tvoji odgovori pokazuju da postoji određena razina stresa ili zabrinutosti, ali i prostor za samopomoć i podršku zajednice. Pokušaj napraviti mali korak prije nego se osjećaj pojača.",
+          recs: [
+            ["Smirivanje", "Napravi kratku vježbu disanja ili izađi na nekoliko minuta zraka."],
+            ["Zapis", "Zapiši što te najviše opterećuje u jednoj rečenici."],
+            ["Forum", "Pogledaj postojeće teme i vidi ima li netko slično iskustvo."],
+            ["Granice", "Danas smanji jednu obavezu koja nije hitna."]
+          ]
+        };
+      }
+
+      return {
+        level: "Stabilno stanje",
+        title: "Trenutno izgledaš relativno stabilno.",
+        color: "#4f9d69",
+        description: "Prema odgovorima, trenutno nema znakova visokog opterećenja. Ipak, dobro je nastaviti pratiti svoje stanje i koristiti forum ili podršku zajednice kada osjetiš da ti treba razgovor.",
+        recs: [
+          ["Održavanje", "Nastavi s navikama koje ti pomažu da ostaneš stabilan/stabilna."],
+          ["Prevencija", "Ako primijetiš pogoršanje, reagiraj ranije, ne tek kad postane teško."],
+          ["Podrška", "Možeš pomoći drugima na forumu svojim iskustvom i razumijevanjem."],
+          ["Check-in", "Vrati se ovoj procjeni kada osjetiš promjenu raspoloženja."]
+        ]
+      };
+    }
+
+    function showResult() {
+      const result = calculateResult();
+      const content = getResultContent(result);
+
+      quizArea.style.display = "none";
+      resultArea.style.display = "block";
+      progressFill.style.width = "100%";
+
+      const degrees = Math.round((result.percentage / 100) * 360);
+      const circle = document.getElementById("scoreCircle");
+      circle.style.background = `conic-gradient(${content.color} ${degrees}deg, #efe4d5 ${degrees}deg)`;
+      document.getElementById("scoreText").textContent = `${result.percentage}%`;
+      document.getElementById("resultLabel").textContent = content.level;
+      document.getElementById("resultTitle").textContent = content.title;
+      document.getElementById("resultDescription").textContent = content.description;
+
+      document.getElementById("recommendations").innerHTML = content.recs.map(([title, text]) => `
+        <div class="rec-card">
+          <strong>${title}</strong>
+          <p>${text}</p>
+        </div>
+      `).join("");
+
+      resultArea.dataset.copyText = `NADA Check-in rezultat: ${content.level}. ${content.title} ${content.description}`;
+      resultArea.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (answers[currentQuestion] === null) return;
+      if (currentQuestion === questions.length - 1) {
+        showResult();
+      } else {
+        currentQuestion += 1;
+        renderQuestion();
+      }
+    });
+
+    backBtn.addEventListener("click", () => {
+      if (currentQuestion === 0) return;
+      currentQuestion -= 1;
+      renderQuestion();
+    });
+
+    restartBtn.addEventListener("click", () => {
+      currentQuestion = 0;
+      answers = new Array(questions.length).fill(null);
+      resultArea.style.display = "none";
+      quizArea.style.display = "block";
+      renderQuestion();
+      openCheckinModal();
+    });
+
+    copyResultBtn.addEventListener("click", async () => {
+      const text = resultArea.dataset.copyText || "NADA Check-in rezultat";
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast("Preporuka je kopirana.");
+      } catch (error) {
+        showToast("Kopiranje nije uspjelo.");
+      }
+    });
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function clearBreathingTimers() {
+      breathingTimers.forEach(timer => clearTimeout(timer));
+      breathingTimers = [];
+    }
+
+    function setBreathingState(step, count, text, stateClass) {
+      breathingStep.textContent = step;
+      breathingCount.textContent = count;
+      breathingText.textContent = text;
+      breathingOrb.className = `breathing-orb ${stateClass || ""}`;
+    }
+
+    function closeBreathingModal() {
+      clearBreathingTimers();
+      breathingModal.classList.remove("open");
+      breathingModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      setBreathingState("Pripremi se", "4", "Udahni polako kroz nos i prati krug na ekranu.", "");
+    }
+
+    function runCountdown(seconds, onTick, onDone) {
+      for (let i = 0; i <= seconds; i++) {
+        breathingTimers.push(setTimeout(() => {
+          const remaining = seconds - i;
+          if (remaining > 0) onTick(remaining);
+          if (remaining === 0 && onDone) onDone();
+        }, i * 1000));
+      }
+    }
+
+    function startBreathing() {
+      clearBreathingTimers();
+      breathingModal.classList.add("open");
+      breathingModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+
+      const cycle = () => {
+        setBreathingState("Udahni", "4", "Polako udahni kroz nos. Pusti da se krug širi zajedno s udahom.", "inhale");
+        runCountdown(4, n => breathingCount.textContent = n, () => {
+          setBreathingState("Zadrži", "4", "Zadrži dah kratko i ostani miran/mirna.", "hold");
+          runCountdown(4, n => breathingCount.textContent = n, () => {
+            setBreathingState("Izdahni", "6", "Polako izdahni. Krug se smanjuje, a tijelo se opušta.", "exhale");
+            runCountdown(6, n => breathingCount.textContent = n, () => {
+              setBreathingState("Gotovo", "✓", "Vježba je završena. Ako ti je pomoglo, možeš je odmah ponoviti.", "");
+            });
+          });
+        });
+      };
+
+      cycle();
+    }
+
+    closeBreathing.addEventListener("click", closeBreathingModal);
+    stopBreathing.addEventListener("click", closeBreathingModal);
+    restartBreathing.addEventListener("click", startBreathing);
+    breathingModal.addEventListener("click", (event) => {
+      if (event.target === breathingModal) closeBreathingModal();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        if (breathingModal.classList.contains("open")) closeBreathingModal();
+        if (checkinModal.classList.contains("open")) closeCheckinModal();
+      }
+    });
+
+    renderQuestion();
+  </script>
+</body>
+</html>

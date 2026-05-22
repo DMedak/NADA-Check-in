@@ -641,23 +641,24 @@
     .toast {
       position: fixed;
       left: 50%;
-      bottom: 24px;
-      transform: translateX(-50%) translateY(20px);
+      top: 50%;
+      transform: translate(-50%, -50%);
       opacity: 0;
       pointer-events: none;
-      background: #241f1b;
-      color: #fff;
-      padding: 13px 17px;
-      border-radius: 999px;
-      box-shadow: 0 18px 45px rgba(0,0,0,.22);
-      transition: .22s ease;
-      z-index: 60;
-      font-weight: 800;
+      width: min(420px, calc(100% - 32px));
+      padding: 26px 28px;
+      border-radius: 30px;
+      background: linear-gradient(135deg, #ffffff, #f8f8f8);
+      border: 1px solid rgba(244,185,66,.42);
+      box-shadow: 0 34px 90px rgba(36,31,27,.22);
+      transition: opacity .35s ease;
+      z-index: 9999;
       text-align: center;
     }
 
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
+    .toast.show {
+      opacity: 1;
+    }
 
     .checkin-modal,
     .breathing-modal {
@@ -1354,11 +1355,21 @@
       }
     });
 
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), 2200);
-    }
+    function showToast(message, icon = "✨") {
+    toast.innerHTML = `
+      <div style="font-size:44px;line-height:1;margin-bottom:14px;">${icon}</div>
+      <div style="font-size:20px;font-weight:900;color:#241f1b;line-height:1.45;">
+        ${message}
+      </div>
+    `;
+
+    toast.classList.add("show");
+    clearTimeout(window.toastTimeout);
+
+    window.toastTimeout = setTimeout(() => {
+      toast.classList.remove("show");
+    }, 4500);
+  }
 
     function clearBreathingTimers() {
       breathingTimers.forEach(timer => clearTimeout(timer));
@@ -1430,50 +1441,30 @@
 
     function randomSupportMessage() {
       const messages = [
-        "Nisi sam/a u ovome 🌿",
-        "Dovoljno je krenuti malim korakom.",
-        "I teški dani prođu.",
-        "Traženje pomoći je znak snage.",
-        "Odmor je također produktivan.",
-        "Ne moraš sve riješiti danas.",
-        "Ponekad je dovoljno samo stati i udahnuti.",
-        "I mali napredak je i dalje napredak 🌱",
-        "Tvoje emocije su važne.",
-        "U redu je imati loš dan.",
-        "Ne moraš uvijek biti jak/a.",
-        "Svaki novi dan je nova prilika.",
-        "Briga o sebi nije sebičnost.",
-        "Ponekad je razgovor prvi korak prema olakšanju.",
-        "Nije sramota tražiti podršku.",
-        "Dovoljno je ići korak po korak.",
-        "Tvoje misli ne definiraju tvoju vrijednost.",
-        "Danas napravi nešto lijepo za sebe ☀️",
-        "I odmor je dio napretka.",
-        "Neke stvari trebaju vrijeme i to je okej.",
-        "Nisi slab/a zato što ti je teško.",
-        "Mala promjena može napraviti veliku razliku.",
-        "Tvoj trud vrijedi, čak i kad ga ne vidiš odmah.",
-        "Pokušaj biti nježniji/a prema sebi.",
-        "Ne moraš prolaziti kroz sve sam/a.",
-        "Bitno je da nastavljaš dalje.",
-        "Jedan duboki udah može pomoći više nego što misliš.",
-        "Sasvim je u redu usporiti.",
-        "Nije svaki dan isti i to je normalno.",
-        "Nekad je dovoljno samo izdržati današnji dan.",
-        "Vrijediš i kada nisi produktivan/na.",
-        "Tvoje stanje se može promijeniti nabolje.",
-        "Male navike često najviše pomažu.",
-        "Pokušaj se danas malo odmoriti.",
-        "Nema savršenih ljudi.",
-        "Ponekad je hrabrost samo nastaviti dalje.",
-        "Možeš biti ponosan/na na sebe i zbog malih stvari.",
-        "Ne moraš imati sve odgovore odmah.",
-        "Iza teških trenutaka često dolazi mir.",
-        "Važno je da ne odustaneš od sebe ❤️"
+        { text: "Nisi sam/a u ovome.", icon: "🤝" },
+        { text: "Dovoljno je krenuti malim korakom.", icon: "🌱" },
+        { text: "I teški dani prođu.", icon: "☀️" },
+        { text: "Traženje pomoći je znak snage.", icon: "💪" },
+        { text: "Odmor je također produktivan.", icon: "🛌" },
+        { text: "Ne moraš sve riješiti danas.", icon: "🧘" },
+        { text: "Ponekad je dovoljno samo stati i udahnuti.", icon: "🌬️" },
+        { text: "I mali napredak je i dalje napredak.", icon: "⬆️" },
+        { text: "Tvoje emocije su važne.", icon: "❤️" },
+        { text: "U redu je imati loš dan.", icon: "🌧️" },
+        { text: "Ne moraš uvijek biti jak/a.", icon: "🫶" },
+        { text: "Svaki novi dan je nova prilika.", icon: "🌅" },
+        { text: "Briga o sebi nije sebičnost.", icon: "🫂" },
+        { text: "Razgovor može biti prvi korak prema olakšanju.", icon: "💬" },
+        { text: "Nije sramota tražiti podršku.", icon: "🤍" },
+        { text: "Dovoljno je ići korak po korak.", icon: "👣" },
+        { text: "Tvoje misli ne definiraju tvoju vrijednost.", icon: "🧠" },
+        { text: "Danas napravi nešto lijepo za sebe.", icon: "☕" },
+        { text: "Neke stvari trebaju vrijeme i to je okej.", icon: "⏳" },
+        { text: "Važno je da ne odustaneš od sebe.", icon: "⭐" }
       ];
 
       const random = messages[Math.floor(Math.random() * messages.length)];
-      showToast(random);
+      showToast(random.text, random.icon);
     }
   </script>
 </body>

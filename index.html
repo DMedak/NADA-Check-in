@@ -953,12 +953,12 @@
 
         <aside class="side-card">
           <div class="info-box">
-            <h3>Što ova funkcionalnost radi?</h3>
-            <p>Prikuplja odgovore, računa bodove i prema rezultatu prikazuje preporuku. Sve se izvršava u pregledniku pomoću HTML-a, CSS-a i JavaScripta.</p>
+            <h3>Što ovaj test radi?</h3>
+            <p>Prikuplja odgovore, računa bodove i prema rezultatu prikazuje preporuku.</p>
           </div>
           <div class="info-box">
             <h3>Privatnost</h3>
-            <p>Odgovori se ne šalju na server. Trenutna verzija ne sprema osobne podatke i ne traži registraciju.</p>
+            <p>Odgovori se ne spremaju nigdje. Bez registracije, imena i prezimena.</p>
           </div>
           <div class="info-box">
             <h3>Napomena</h3>
@@ -976,7 +976,7 @@
 
     <section id="resursi" class="container">
       <h2 class="section-title">Brzi resursi podrške</h2>
-      <p class="section-subtitle">Dodatni dio aplikacije korisniku odmah nudi nekoliko smjerova djelovanja, ovisno o tome treba li mu razgovor, zajednica ili hitna pomoć.</p>
+      <p class="section-subtitle">Dodatni dio nudi nekoliko smjerova djelovanja, ovisno o tome treba li korisniku razgovor, smirivanje ili dodatna podrška.</p>
 
       <div class="resources-grid">
         <article class="resource">
@@ -997,17 +997,17 @@
 
         <article class="resource">
           <div>
-            <h3>Hitna situacija</h3>
-            <p>Ako si u neposrednoj opasnosti ili misliš da bi netko mogao biti ozlijeđen, odmah kontaktiraj hitne službe ili osobu od povjerenja.</p>
+            <h3>Poruka podrške</h3>
+            <p>Klikni za kratku nasumičnu poruku podrške i ohrabrenja.</p>
           </div>
-          <a class="btn btn-danger" href="tel:112">Nazovi 112</a>
+          <button class="btn btn-danger" type="button" onclick="randomSupportMessage()">Prikaži poruku</button>
         </article>
       </div>
     </section>
   </main>
 
   <footer class="container footer">
-    <strong>NADA Check-in</strong> — dodatna programska funkcionalnost izrađena uz forum. Aplikacija je edukativnog karaktera i služi za usmjeravanje korisnika prema podršci. Ne zamjenjuje liječnika, psihologa, psihoterapeuta ni kriznu službu.
+    <strong>NADA Check-in</strong> — Aplikacija je edukativnog karaktera i služi za usmjeravanje korisnika prema podršci. Ne zamjenjuje liječnika, psihologa, psihoterapeuta ni kriznu službu.
   </footer>
 
   <div class="toast" id="toast">Kopirano.</div>
@@ -1427,6 +1427,54 @@
     });
 
     renderQuestion();
+
+    function randomSupportMessage() {
+      const messages = [
+        "Nisi sam/a u ovome 🌿",
+        "Dovoljno je krenuti malim korakom.",
+        "I teški dani prođu.",
+        "Traženje pomoći je znak snage.",
+        "Odmor je također produktivan.",
+        "Ne moraš sve riješiti danas.",
+        "Ponekad je dovoljno samo stati i udahnuti.",
+        "I mali napredak je i dalje napredak 🌱",
+        "Tvoje emocije su važne.",
+        "U redu je imati loš dan.",
+        "Ne moraš uvijek biti jak/a.",
+        "Svaki novi dan je nova prilika.",
+        "Briga o sebi nije sebičnost.",
+        "Ponekad je razgovor prvi korak prema olakšanju.",
+        "Nije sramota tražiti podršku.",
+        "Dovoljno je ići korak po korak.",
+        "Tvoje misli ne definiraju tvoju vrijednost.",
+        "Danas napravi nešto lijepo za sebe ☀️",
+        "I odmor je dio napretka.",
+        "Neke stvari trebaju vrijeme i to je okej.",
+        "Nisi slab/a zato što ti je teško.",
+        "Mala promjena može napraviti veliku razliku.",
+        "Tvoj trud vrijedi, čak i kad ga ne vidiš odmah.",
+        "Pokušaj biti nježniji/a prema sebi.",
+        "Ne moraš prolaziti kroz sve sam/a.",
+        "Bitno je da nastavljaš dalje.",
+        "Jedan duboki udah može pomoći više nego što misliš.",
+        "Sasvim je u redu usporiti.",
+        "Nije svaki dan isti i to je normalno.",
+        "Nekad je dovoljno samo izdržati današnji dan.",
+        "Vrijediš i kada nisi produktivan/na.",
+        "Tvoje stanje se može promijeniti nabolje.",
+        "Male navike često najviše pomažu.",
+        "Pokušaj se danas malo odmoriti.",
+        "Nema savršenih ljudi.",
+        "Ponekad je hrabrost samo nastaviti dalje.",
+        "Možeš biti ponosan/na na sebe i zbog malih stvari.",
+        "Ne moraš imati sve odgovore odmah.",
+        "Iza teških trenutaka često dolazi mir.",
+        "Važno je da ne odustaneš od sebe ❤️"
+      ];
+
+      const random = messages[Math.floor(Math.random() * messages.length)];
+      showToast(random);
+    }
   </script>
 </body>
 </html>

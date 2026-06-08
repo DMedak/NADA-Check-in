@@ -768,49 +768,105 @@
       height: 230px;
       display: grid;
       place-items: center;
-      margin: 8px 0 10px;
+      margin: 6px 0 16px;
+      position: relative;
+    }
+
+    .breathing-orb-wrap::before {
+      content: "";
+      position: absolute;
+      width: 174px;
+      height: 174px;
+      border-radius: 999px;
+      border: 1px solid rgba(244,185,66,.28);
+      background: rgba(244,185,66,.06);
+      animation: softPulse 8s ease-in-out infinite;
+    }
+
+    @keyframes softPulse {
+      0%, 100% { transform: scale(.94); opacity: .32; }
+      50% { transform: scale(1.08); opacity: .62; }
     }
 
     .breathing-orb {
-      width: 132px;
-      height: 132px;
+      width: 118px;
+      height: 118px;
       border-radius: 999px;
-      background: radial-gradient(circle at 35% 30%, #fff7d7, var(--brand) 54%, #e58d66 100%);
-      box-shadow: 0 20px 60px rgba(244,185,66,.42), inset 0 0 32px rgba(255,255,255,.44);
+      background: radial-gradient(circle at 35% 30%, #fffdf0 0%, #fff1b8 30%, var(--brand) 62%, #e58d66 100%);
+      box-shadow:
+        0 18px 46px rgba(244,185,66,.38),
+        0 0 0 10px rgba(244,185,66,.08),
+        inset 0 0 28px rgba(255,255,255,.48);
       transform: scale(1);
-      transition: transform 4s ease-in-out;
+      transition: transform 4s ease-in-out, box-shadow 4s ease-in-out;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
     }
 
-    .breathing-orb.inhale { transform: scale(1.42); }
-    .breathing-orb.hold { transform: scale(1.42); transition-duration: .2s; }
-    .breathing-orb.exhale { transform: scale(.86); transition-duration: 6s; }
+    .breathing-orb.inhale {
+      transform: scale(1.42);
+      transition-duration: 4s;
+      box-shadow:
+        0 24px 62px rgba(244,185,66,.44),
+        0 0 0 18px rgba(244,185,66,.12),
+        inset 0 0 30px rgba(255,255,255,.5);
+    }
+    .breathing-orb.hold {
+      transform: scale(1.42);
+      transition-duration: .35s;
+      box-shadow:
+        0 24px 62px rgba(244,185,66,.42),
+        0 0 0 18px rgba(244,185,66,.10),
+        inset 0 0 30px rgba(255,255,255,.5);
+    }
+    .breathing-orb.exhale {
+      transform: scale(.88);
+      transition-duration: 6s;
+      box-shadow:
+        0 13px 34px rgba(244,185,66,.26),
+        0 0 0 7px rgba(79,157,105,.08),
+        inset 0 0 26px rgba(255,255,255,.42);
+    }
+    .breathing-orb.pause {
+      transform: scale(.88);
+      transition-duration: .45s;
+      box-shadow:
+        0 12px 32px rgba(79,157,105,.22),
+        0 0 0 7px rgba(79,157,105,.08),
+        inset 0 0 26px rgba(255,255,255,.42);
+    }
 
     .breathing-step {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 44px;
-      padding: 10px 16px;
+      min-height: 42px;
+      padding: 9px 15px;
       border-radius: 999px;
-      background: rgba(255,255,255,.7);
+      background: rgba(255,255,255,.74);
       border: 1px solid var(--border);
       font-weight: 950;
       color: var(--brand-dark);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
 
     .breathing-count {
-      font-size: clamp(46px, 8vw, 76px);
+      font-size: clamp(38px, 7vw, 58px);
       font-weight: 950;
-      letter-spacing: -.08em;
+      letter-spacing: -.06em;
       margin: 0;
-      color: var(--text);
+      color: #3d2a08;
+      line-height: 1;
+      transform: translateY(-1px);
+      text-shadow: 0 2px 12px rgba(255,255,255,.55);
     }
 
     .breathing-text {
       color: var(--muted);
-      line-height: 1.6;
-      margin: 8px auto 20px;
+      line-height: 1.55;
+      margin: 6px auto 18px;
       max-width: 420px;
     }
 
@@ -819,6 +875,30 @@
       justify-content: center;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    .video-shell {
+      width: min(760px, 100%);
+    }
+
+    .video-frame-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      max-height: 78vh;
+      margin: 14px auto 0;
+      border-radius: 26px;
+      overflow: hidden;
+      background: #241f1b;
+      box-shadow: 0 24px 64px rgba(36,31,27,.24);
+    }
+
+    .video-frame-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
     }
 
 
@@ -891,7 +971,6 @@
         </div>
       </div>
 
-      <div class="hero-card" aria-hidden="true">
         <div class="phone">
           <div class="phone-header">
             <span>NADA digitalna podrška</span>
@@ -904,7 +983,6 @@
             <div class="mini-option"><span class="mini-icon">🤝</span> Želim podršku zajednice</div>
           </div>
         </div>
-      </div>
     </section>
 
     <section id="checkin" class="checkin-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="NADA Check-in procjena">
@@ -991,9 +1069,12 @@
         <article class="resource">
           <div>
             <h3>Tehnika smirivanja</h3>
-            <p>Pokušaj 4-4-6 disanje: udah 4 sekunde, zadržavanje 4 sekunde, izdah 6 sekundi. Ponovi 5 puta.</p>
+            <p>Pokušaj 4-4-6-2 disanje: udah 4 sekunde, zadržavanje 4 sekunde, izdah 6 sekundi i kratka pauza 2 sekunde. Vježba se ponavlja 3 ciklusa.</p>
           </div>
-          <button class="btn btn-light" type="button" onclick="startBreathing()">Pokreni vježbu</button>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-light" type="button" onclick="startBreathing()">Pokreni vježbu</button>
+            <button class="btn btn-primary" type="button" onclick="openBreathingVideo()">Pogledaj video</button>
+          </div>
         </article>
 
         <article class="resource">
@@ -1020,13 +1101,36 @@
       <div class="breathing-content">
         <div class="breathing-step" id="breathingStep">Pripremi se</div>
         <div class="breathing-orb-wrap">
-          <div class="breathing-orb" id="breathingOrb"></div>
+          <div class="breathing-orb" id="breathingOrb">
+            <span class="breathing-count" id="breathingCount">4</span>
+          </div>
         </div>
-        <p class="breathing-count" id="breathingCount">4</p>
-        <p class="breathing-text" id="breathingText">Udahni polako kroz nos i prati krug na ekranu.</p>
+        <p class="breathing-text" id="breathingText">Udahni polako kroz nos i prati ritam 4-4-6-2.</p>
         <div class="breathing-actions">
           <button class="btn btn-primary" type="button" id="restartBreathing">Ponovi vježbu</button>
           <button class="btn btn-light" type="button" id="stopBreathing">Zatvori</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <div class="breathing-modal" id="videoModal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Video vježba disanja">
+    <div class="breathing-shell video-shell">
+      <button class="modal-close" type="button" id="closeVideo" aria-label="Zatvori video" style="position:absolute;right:16px;top:16px;z-index:2;">×</button>
+      <div class="breathing-content">
+        <div class="breathing-step">Video vodič</div>
+        <h2 style="margin: 10px 0 6px; letter-spacing:-.04em;">Vježba disanja uz video</h2>
+        <p class="breathing-text">Ako ti više odgovara vizualno praćenje, pogledaj kratki video vodič za disanje.</p>
+        <div class="video-frame-wrap">
+          <iframe
+            id="breathingVideoFrame"
+            src=""
+            title="YouTube Shorts video vježba disanja"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen>
+          </iframe>
         </div>
       </div>
     </div>
@@ -1142,6 +1246,9 @@
     const breathingStep = document.getElementById("breathingStep");
     const breathingCount = document.getElementById("breathingCount");
     const breathingText = document.getElementById("breathingText");
+    const videoModal = document.getElementById("videoModal");
+    const closeVideo = document.getElementById("closeVideo");
+    const breathingVideoFrame = document.getElementById("breathingVideoFrame");
     let breathingTimers = [];
 
 
@@ -1388,7 +1495,21 @@
       breathingModal.classList.remove("open");
       breathingModal.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "";
-      setBreathingState("Pripremi se", "4", "Udahni polako kroz nos i prati krug na ekranu.", "");
+      setBreathingState("Pripremi se", "4", "Udahni polako kroz nos i prati ritam 4-4-6-2 kroz 3 ciklusa.", "");
+    }
+
+    function openBreathingVideo() {
+      videoModal.classList.add("open");
+      videoModal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      breathingVideoFrame.src = "https://www.youtube.com/embed/CW_kC7lMLBA?rel=0&modestbranding=1&playsinline=1";
+    }
+
+    function closeBreathingVideo() {
+      videoModal.classList.remove("open");
+      videoModal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      breathingVideoFrame.src = "";
     }
 
     function runCountdown(seconds, onTick, onDone) {
@@ -1407,14 +1528,54 @@
       breathingModal.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden";
 
+      let currentCycle = 1;
+      const totalCycles = 3;
+
       const cycle = () => {
-        setBreathingState("Udahni", "4", "Polako udahni kroz nos. Pusti da se krug širi zajedno s udahom.", "inhale");
+        setBreathingState(
+          `Udahni · ${currentCycle}/${totalCycles}`,
+          "4",
+          "Polako udahni kroz nos. Krug se širi kroz 4 sekunde.",
+          "inhale"
+        );
+
         runCountdown(4, n => breathingCount.textContent = n, () => {
-          setBreathingState("Zadrži", "4", "Zadrži dah kratko i ostani miran/mirna.", "hold");
+          setBreathingState(
+            `Zadrži · ${currentCycle}/${totalCycles}`,
+            "4",
+            "Zadrži dah 4 sekunde i ostani miran/mirna.",
+            "hold"
+          );
+
           runCountdown(4, n => breathingCount.textContent = n, () => {
-            setBreathingState("Izdahni", "6", "Polako izdahni. Krug se smanjuje, a tijelo se opušta.", "exhale");
+            setBreathingState(
+              `Izdahni · ${currentCycle}/${totalCycles}`,
+              "6",
+              "Polako izdahni 6 sekundi. Krug se smanjuje zajedno s izdahom.",
+              "exhale"
+            );
+
             runCountdown(6, n => breathingCount.textContent = n, () => {
-              setBreathingState("Gotovo", "✓", "Vježba je završena. Ako ti je pomoglo, možeš je odmah ponoviti.", "");
+              setBreathingState(
+                `Pauza · ${currentCycle}/${totalCycles}`,
+                "2",
+                "Kratko zastani 2 sekunde prije novog udaha.",
+                "pause"
+              );
+
+              runCountdown(2, n => breathingCount.textContent = n, () => {
+                if (currentCycle < totalCycles) {
+                  currentCycle += 1;
+                  cycle();
+                } else {
+                  setBreathingState(
+                    "Gotovo",
+                    "✓",
+                    "Vježba je završena. Napravio/la si 3 puna ciklusa disanja 4-4-6-2.",
+                    ""
+                  );
+                }
+              });
             });
           });
         });
@@ -1430,8 +1591,14 @@
       if (event.target === breathingModal) closeBreathingModal();
     });
 
+    closeVideo.addEventListener("click", closeBreathingVideo);
+    videoModal.addEventListener("click", (event) => {
+      if (event.target === videoModal) closeBreathingVideo();
+    });
+
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape") {
+        if (videoModal.classList.contains("open")) closeBreathingVideo();
         if (breathingModal.classList.contains("open")) closeBreathingModal();
         if (checkinModal.classList.contains("open")) closeCheckinModal();
       }
